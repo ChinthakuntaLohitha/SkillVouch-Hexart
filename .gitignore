@@ -1,1 +1,17 @@
 node_modules
+# dependencies
+
+
+# environment variables
+.env
+backend/.env
+frontend/.env
+
+# build output
+dist/
+build/
+
+# logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
