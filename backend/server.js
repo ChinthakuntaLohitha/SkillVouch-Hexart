@@ -8,7 +8,11 @@ import { suggestSkills, generateRoadmap } from './ai/mistralSkills.js';
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-app.use(cors({ origin: true }));
+app.use(cors({
+  origin: true,
+  credentials: true
+}));
+
 app.use(express.json());
 
 
