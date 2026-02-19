@@ -1,10 +1,13 @@
 import { ChatMistralAI } from '@langchain/mistralai';
 
-const mistral = new ChatMistralAI({
-  model: 'mistral-small',
-  temperature: 0.3,
-  apiKey: process.env.MISTRAL_API_KEY,
-});
+let mistral = null;
+if (process.env.MISTRAL_API_KEY) {
+  mistral = new ChatMistralAI({
+    model: 'mistral-small',
+    temperature: 0.3,
+    apiKey: process.env.MISTRAL_API_KEY,
+  });
+}
 
 const quizCache = new Map();
 const CACHE_TTL = 10 * 60 * 1000;
@@ -373,6 +376,10 @@ Before outputting:
 
 Generate exactly 10 challenging scenario-based questions covering the appropriate question types:`;
 
+    if (!mistral) {
+      throw new Error('MISTRAL_API_KEY is required for quiz generation');
+    }
+    
     const response = await mistral.invoke(prompt);
     const content = response.content;
 

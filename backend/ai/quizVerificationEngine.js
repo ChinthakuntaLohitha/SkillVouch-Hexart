@@ -1,11 +1,14 @@
 import { ChatMistralAI } from '@langchain/mistralai';
 import { PromptTemplate } from '@langchain/core/prompts';
 
-const mistral = new ChatMistralAI({
-  model: 'mistral-small',
-  temperature: 0.3, // Lower temperature for more consistent, accurate results
-  apiKey: process.env.MISTRAL_API_KEY,
-});
+let mistral = null;
+if (process.env.MISTRAL_API_KEY) {
+  mistral = new ChatMistralAI({
+    model: 'mistral-small',
+    temperature: 0.3, // Lower temperature for more consistent, accurate results
+    apiKey: process.env.MISTRAL_API_KEY,
+  });
+}
 
 // Quiz cache for performance optimization
 const quizCache = new Map();
@@ -215,6 +218,10 @@ export const generateVerificationQuiz = async (skillName, difficulty, verificati
       verification_mode: verificationMode,
       question_count: questionCount
     });
+    
+    if (!mistral) {
+      throw new Error('MISTRAL_API_KEY is required for quiz verification');
+    }
     
     const response = await mistral.invoke(formattedPrompt);
     const content = response.content;

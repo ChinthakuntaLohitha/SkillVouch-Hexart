@@ -4,11 +4,14 @@ dotenv.config();
 import { ChatMistralAI } from '@langchain/mistralai';
 import { PromptTemplate } from '@langchain/core/prompts';
 
-const mistral = new ChatMistralAI({
-  model: 'mistral-small',
-  temperature: 0.4,
-  apiKey: process.env.MISTRAL_API_KEY,
-});
+let mistral = null;
+if (process.env.MISTRAL_API_KEY) {
+  mistral = new ChatMistralAI({
+    model: 'mistral-small',
+    temperature: 0.4,
+    apiKey: process.env.MISTRAL_API_KEY,
+  });
+}
 
 // Skill Suggestion Prompt
 const skillSuggestionPrompt = PromptTemplate.fromTemplate(`
@@ -66,6 +69,10 @@ export const suggestSkills = async (currentSkills = [], currentGoals = []) => {
       currentGoals: currentGoals.join(', ')
     });
 
+    if (!mistral) {
+      throw new Error('MISTRAL_API_KEY is required for skill suggestions');
+    }
+    
     const response = await mistral.invoke(formattedPrompt);
     const content = response.content;
 
@@ -91,6 +98,10 @@ export const generateRoadmap = async (skill) => {
   try {
     const formattedPrompt = await roadmapPrompt.format({ skill });
 
+    if (!mistral) {
+      throw new Error('MISTRAL_API_KEY is required for roadmap generation');
+    }
+    
     const response = await mistral.invoke(formattedPrompt);
     const content = response.content;
 

@@ -5,11 +5,14 @@ import { ChatMistralAI } from '@langchain/mistralai';
 import { PromptTemplate } from '@langchain/core/prompts';
 import { generateSkillAssessmentQuiz } from './skillAssessmentEngine.js';
 
-const mistral = new ChatMistralAI({
-  model: 'mistral-small',
-  temperature: 0.4,
-  apiKey: process.env.MISTRAL_API_KEY,
-});
+let mistral = null;
+if (process.env.MISTRAL_API_KEY) {
+  mistral = new ChatMistralAI({
+    model: 'mistral-small',
+    temperature: 0.4,
+    apiKey: process.env.MISTRAL_API_KEY,
+  });
+}
 
 // Quiz cache for faster responses
 const quizCache = new Map();
@@ -352,6 +355,10 @@ export const generateQuiz = async (
           count: count.toString(),
         });
 
+        if (!mistral) {
+          throw new Error('MISTRAL_API_KEY is required for quiz generation');
+        }
+        
         const response = await mistral.invoke(formattedPrompt);
         const content = response.content;
 
